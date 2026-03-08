@@ -1,0 +1,1 @@
+"""QuantEdge — Test Configuration."""

@@ -1,0 +1,63 @@
+# ============================================
+# QuantEdge — Docker Compose (Phase 1)
+# ============================================
+# IMPORTANT: Uses timescale/timescaledb-ha for ARM64 (M1) support.
+# The base timescale/timescaledb image does NOT ship linux/arm64 builds.
+
+services:
+  timescaledb:
+    image: timescale/timescaledb-ha:pg16-ts2.25
+    container_name: quantedge-timescaledb
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-quantedge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-quantedge_secret_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-quantedge}
+    volumes:
+      - timescaledb_data:/home/postgres/pgdata/data
+      - ./src/db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-quantedge} -d ${POSTGRES_DB:-quantedge}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: quantedge-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quantedge-app
+    env_file:
+      - .env
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src:ro
+    restart: unless-stopped
+
+volumes:
+  timescaledb_data:
+    driver: local
+  redis_data:
+    driver: local

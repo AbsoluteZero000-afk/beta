@@ -1,0 +1,49 @@
+# ============================================
+# QuantEdge — Phase 1-5 Requirements
+# ============================================
+
+# --- Alpaca SDK ---
+alpaca-py==0.43.2
+
+# --- Async PostgreSQL ---
+asyncpg==0.31.0
+
+# --- Sync PostgreSQL (dashboard only) ---
+psycopg2-binary==2.9.10
+
+# --- Redis ---
+redis[hiredis]==7.2.1
+
+# --- Async Runtime ---
+uvloop==0.22.1
+
+# --- Numerical / Signal Computation ---
+numba==0.62.1
+numpy>=1.24,<2.4
+llvmlite>=0.45.0,<0.46
+
+# --- Data Handling ---
+pandas>=2.1.0,<2.3
+orjson==3.10.14
+
+# --- HTTP client (Slack alerts) ---
+httpx==0.28.1
+
+# --- Configuration ---
+python-dotenv==1.0.1
+pydantic==2.10.6
+pydantic-settings==2.7.1
+
+# --- Structured Logging ---
+structlog==25.1.0
+
+# --- Dashboard ---
+streamlit==1.43.0
+plotly==5.24.1
+
+# --- Timezone support (Python 3.9+) ---
+tzdata==2025.1
+
+# --- Testing ---
+pytest==8.3.4
+pytest-asyncio==0.25.3
